@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Ventas - Sistema de Inventario{% endblock %}
+
+{% block page_title %}Gestión de Ventas{% endblock %}
+
+{% block header_buttons %}
+    <a href="{% url 'sales:sale_create' %}" class="btn btn-primary">
+        <i class="bi bi-cart-plus"></i> Nueva Venta
+    </a>
+{% endblock %}
+
+{% block content %}
+<!-- Filtros y Búsqueda -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="q" class="form-control" placeholder="Buscar por cliente o ID..." value="{{ query }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" placeholder="Desde" value="{{ date_from }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" placeholder="Hasta" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">{{ total_sales }}</h5>
+                <p class="card-text">Total de Ventas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">${{ total_revenue|floatformat:2 }}</h5>
+                <p class="card-text">Ingresos Totales</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Ventas -->
+<div class="card">
+    <div class="card-body">
+        {% if sales %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Subtotal</th>
+                        <th>Impuesto</th>
+                        <th>Total</th>
+                        <th>Método Pago</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td><strong>#{{ sale.id }}</strong></td>
+                        <td>{{ sale.client }}</td>
+                        <td>{{ sale.sale_date|date:"d/m/Y H:i" }}</td>
+                        <td>${{ sale.subtotal }}</td>
+                        <td>${{ sale.tax }}</td>
+                        <td><strong>${{ sale.total }}</strong></td>
+                        <td>
+                            <span class="badge bg-secondary">{{ sale.get_payment_method_display }}</span>
+                        </td>
+                        <td>
+                            <span class="badge {% if sale.is_paid %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ sale.is_paid|yesno:"Pagado,Pendiente" }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'sales:sale_detail' sale.pk %}" class="btn btn-outline-primary" title="Ver detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'sales:sale_update' sale.pk %}" class="btn btn-outline-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'sales:sale_delete' sale.pk %}" class="btn btn-outline-danger" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                        Primera
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                        Anterior
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                        Siguiente
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                        Última
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cart" style="font-size: 3rem; color: #6c757d;"></i>
+            <h4 class="mt-3">No se encontraron ventas</h4>
+            <p class="text-muted">No hay ventas que coincidan con tu búsqueda.</p>
+            <a href="{% url 'sales:sale_create' %}" class="btn btn-primary">
+                <i class="bi bi-cart-plus"></i> Crear Primera Venta
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

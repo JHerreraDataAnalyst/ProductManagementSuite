@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Sistema de Inventario{% endblock %}
+
+{% block page_title %}Dashboard Principal{% endblock %}
+
+{% block header_buttons %}
+    <div class="btn-group me-2">
+        <button type="button" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-download"></i> Exportar
+        </button>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Estadísticas principales -->
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_products }}</h4>
+                        <p class="card-text">Productos</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-box" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ low_stock_products }}</h4>
+                        <p class="card-text">Stock Bajo</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">${{ monthly_revenue|floatformat:2 }}</h4>
+                        <p class="card-text">Ventas Mes</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-currency-dollar" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_clients }}</h4>
+                        <p class="card-text">Clientes</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Gráfico de ventas -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Ventas Mensuales</h5>
+            </div>
+            <div class="card-body">
+                {% if monthly_sales_count > 0 %}
+                <canvas id="salesChart" width="400" height="200"></canvas>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-graph-up" style="font-size: 3rem; color: #6c757d;"></i>
+                    <p class="text-muted mt-2">No hay datos de ventas para mostrar</p>
+                    <a href="{% url 'sales:sale_create' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-cart-plus"></i> Crear Primera Venta
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Productos en inventario -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Productos en Inventario</h5>
+            </div>
+            <div class="card-body">
+                {% if top_products %}
+                <div class="list-group list-group-flush">
+                    {% for product in top_products %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">{{ product.category.name }}</small><br>
+                            {{ product.name }}
+                        </div>
+                        <span class="badge {% if product.stock_quantity <= product.min_stock %}bg-warning{% else %}bg-success{% endif %} rounded-pill">
+                            {{ product.stock_quantity }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay productos registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Acciones rápidas -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'products:product_create' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-plus-circle"></i> Nuevo Producto
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'sales:sale_create' %}" class="btn btn-outline-success w-100">
+                            <i class="bi bi-cart-plus"></i> Nueva Venta
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'clients:client_create' %}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-person-plus"></i> Nuevo Cliente
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'products:product_list' %}" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-clipboard-data"></i> Ver Inventario
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if monthly_sales_count > 0 %}
+<script>
+// Gráfico simple de ventas (placeholder)
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+        datasets: [{
+            label: 'Ventas Mensuales',
+            data: [12000, 19000, 15000, 25000, 22000, 30000],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

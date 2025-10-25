@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Venta - Sistema de Inventario{% endblock %}
+
+{% block page_title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                </div>
+                
+                <h4>¿Estás seguro de que quieres eliminar esta venta?</h4>
+                
+                <div class="alert alert-danger mt-4">
+                    <h5>Venta #{{ sale.id }}</h5>
+                    <p class="mb-1"><strong>Cliente:</strong> {{ sale.client }}</p>
+                    <p class="mb-1"><strong>Fecha:</strong> {{ sale.sale_date|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-0"><strong>Total:</strong> ${{ sale.total }}</p>
+                </div>
+
+                <p class="text-muted">
+                    Esta acción no se puede deshacer. Se eliminarán todos los datos 
+                    asociados a esta venta, incluyendo los items de venta.
+                </p>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'sales:sale_detail' sale.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Sí, Eliminar Venta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

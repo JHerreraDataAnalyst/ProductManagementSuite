@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Producto - Sistema de Inventario{% endblock %}
+
+{% block page_title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                </div>
+                
+                <h4>¿Estás seguro de que quieres eliminar este producto?</h4>
+                
+                <div class="alert alert-danger mt-4">
+                    <h5>{{ product.name }}</h5>
+                    <p class="mb-1"><strong>SKU:</strong> {{ product.sku }}</p>
+                    <p class="mb-0"><strong>Stock actual:</strong> {{ product.stock }} unidades</p>
+                </div>
+
+                <p class="text-muted">
+                    Esta acción no se puede deshacer. Se eliminarán todos los datos 
+                    asociados a este producto, incluyendo su historial de ventas.
+                </p>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Sí, Eliminar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
