@@ -1,24 +1,24 @@
 # Product Management Suite
 
-Sistema completo de gestión de inventario, ventas y clientes desarrollado con Django y Supabase.
+A comprehensive inventory, sales, and customer management system built with Django and Supabase.
 
-## 🚀 Características
+## 🚀 Features
 
-- **Gestión de Inventario** - Control de stock y productos
-- **Sistema de Ventas** - Registro y seguimiento de ventas
-- **Gestión de Clientes** - Base de datos de clientes
-- **Reportes en Tiempo Real** - Gráficos con Chart.js
-- **API REST** - Configuración de productos con Django REST Framework
+- **Inventory Management** - Stock and product control
+- **Sales System** - Sales recording and tracking
+- **Customer Management** - Customer database
+- **Real-Time Reports** - Charts with Chart.js
+- **REST API** - Product configuration with Django REST Framework
 
-## 🛠️ Tecnologías
+## 🛠️ Technologies
 
 - **Backend:** Django, Django REST Framework
-- **Base de datos:** PostgreSQL (Supabase)
+- **Database:** PostgreSQL (Supabase)
 - **Frontend:** Bootstrap 5, Chart.js
-- **Autenticación:** Sistema de usuarios Django
+- **Authentication:** Django user system
 
-## 📦 Instalación
+## 📦 Installation
 
-1. Clonar repositorio:
+1. Clone the repository:
 ```bash
-git clone https://github.com/TuUsuario/ProductManagementSuite.git
+git clone https://github.com/YourUsername/ProductManagementSuite.git
