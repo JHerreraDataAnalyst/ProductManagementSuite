@@ -3,7 +3,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .models import Product, Category
-from .forms import ProductForm
+from .forms import ProductForm, CategoryForm
+
 
 def product_list(request):
     # Filtros y búsqueda
@@ -99,3 +100,73 @@ def product_delete(request, pk):
         'product': product,
     }
     return render(request, 'products/product_confirm_delete.html', context)
+
+
+
+
+
+
+
+# Vistas para Categorías
+def category_list(request):
+    categories = Category.objects.all()
+    
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'products/category_list.html', context)
+
+def category_create(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Categoría "{category.name}" creada exitosamente.')
+            return redirect('products:category_list')
+    else:
+        form = CategoryForm()
+    
+    context = {
+        'form': form,
+        'title': 'Crear Categoría',
+    }
+    return render(request, 'products/category_form.html', context)
+
+def category_update(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Categoría "{category.name}" actualizada exitosamente.')
+            return redirect('products:category_list')
+    else:
+        form = CategoryForm(instance=category)
+    
+    context = {
+        'form': form,
+        'title': 'Editar Categoría',
+        'category': category,
+    }
+    return render(request, 'products/category_form.html', context)
+
+def category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    
+    if request.method == 'POST':
+        category_name = category.name
+        # Verificar si hay productos usando esta categoría
+        product_count = Product.objects.filter(category=category).count()
+        if product_count > 0:
+            messages.error(request, f'No se puede eliminar la categoría "{category_name}" porque tiene {product_count} productos asociados.')
+            return redirect('products:category_list')
+        
+        category.delete()
+        messages.success(request, f'Categoría "{category_name}" eliminada exitosamente.')
+        return redirect('products:category_list')
+    
+    context = {
+        'category': category,
+    }
+    return render(request, 'products/category_confirm_delete.html', context)

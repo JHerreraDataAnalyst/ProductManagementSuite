@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'dashboard',
     'crispy_forms',
     'crispy_bootstrap5',
+    'rest_framework',
+    'corsheaders',  # Para permitir requests desde otros dominios
 ]
 
 
@@ -53,6 +55,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # ← Debe ir primero
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -152,3 +155,14 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 
 
+# Configuración de REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
+}
+
+# CORS settings (para desarrollo)
+CORS_ALLOW_ALL_ORIGINS = True  # Solo en desarrollo
