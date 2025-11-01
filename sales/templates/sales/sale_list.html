@@ -39,20 +39,37 @@
 </div>
 
 <!-- Estadísticas -->
+<!-- Reemplaza la sección de estadísticas con esta versión mejorada -->
 <div class="row mb-4">
-    <div class="col-md-6">
+    <div class="col-md-3">
         <div class="card bg-primary text-white">
-            <div class="card-body">
-                <h5 class="card-title">{{ total_sales }}</h5>
-                <p class="card-text">Total de Ventas</p>
+            <div class="card-body text-center py-3">
+                <h4 class="card-title">{{ total_sales }}</h4>
+                <p class="card-text mb-0">Total Ventas</p>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-3">
         <div class="card bg-success text-white">
-            <div class="card-body">
-                <h5 class="card-title">${{ total_revenue|floatformat:2 }}</h5>
-                <p class="card-text">Ingresos Totales</p>
+            <div class="card-body text-center py-3">
+                <h4 class="card-title">${{ total_revenue|floatformat:2 }}</h4>
+                <p class="card-text mb-0">Ingresos Totales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center py-3">
+                <h4 class="card-title">{{ paid_sales }}</h4>
+                <p class="card-text mb-0">Ventas Pagadas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center py-3">
+                <h4 class="card-title">{{ pending_sales }}</h4>
+                <p class="card-text mb-0">Pendientes</p>
             </div>
         </div>
     </div>

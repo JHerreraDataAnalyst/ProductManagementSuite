@@ -2,14 +2,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.db import models  # ✅ AGREGAR ESTA IMPORTACIÓN
 from .models import Product, Category
 from .forms import ProductForm, CategoryForm
-
 
 def product_list(request):
     # Filtros y búsqueda
     query = request.GET.get('q', '')
     category_id = request.GET.get('category', '')
+    stock_status = request.GET.get('stock_status', '')
     
     products = Product.objects.filter(is_active=True)
     
@@ -24,8 +25,26 @@ def product_list(request):
     if category_id:
         products = products.filter(category_id=category_id)
     
+    # Filtro por estado de stock
+    if stock_status == 'low':
+        products = products.filter(stock_quantity__lte=models.F('min_stock'), stock_quantity__gt=0)
+    elif stock_status == 'out':
+        products = products.filter(stock_quantity=0)
+    elif stock_status == 'normal':
+        products = products.filter(stock_quantity__gt=models.F('min_stock'))
+    
+    # Estadísticas
+    total_products = Product.objects.count()
+    active_products = Product.objects.filter(is_active=True).count()
+    low_stock_count = Product.objects.filter(
+        stock_quantity__lte=models.F('min_stock'), 
+        stock_quantity__gt=0,
+        is_active=True
+    ).count()
+    out_of_stock_count = Product.objects.filter(stock_quantity=0, is_active=True).count()
+    
     # Paginación
-    paginator = Paginator(products, 10)  # 10 productos por página
+    paginator = Paginator(products, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -34,7 +53,12 @@ def product_list(request):
         'page_obj': page_obj,
         'query': query,
         'category_id': category_id,
-        'categories': Category.objects.all(),  # Cambio aquí
+        'stock_status': stock_status,
+        'categories': Category.objects.all(),
+        'total_products': total_products,
+        'active_products': active_products,
+        'low_stock_count': low_stock_count,
+        'out_of_stock_count': out_of_stock_count,
     }
     return render(request, 'products/product_list.html', context)
 

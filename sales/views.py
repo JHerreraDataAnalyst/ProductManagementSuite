@@ -44,9 +44,11 @@ def sale_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Estadísticas
+    # Estadísticas mejoradas
     total_sales = sales.count()
     total_revenue = sales.aggregate(total=Sum('total'))['total'] or 0
+    paid_sales = sales.filter(is_paid=True).count()
+    pending_sales = sales.filter(is_paid=False).count()
     
     context = {
         'sales': page_obj,
@@ -56,6 +58,8 @@ def sale_list(request):
         'date_to': date_to,
         'total_sales': total_sales,
         'total_revenue': total_revenue,
+        'paid_sales': paid_sales,
+        'pending_sales': pending_sales,
     }
     return render(request, 'sales/sale_list.html', context)
 
@@ -75,21 +79,50 @@ def sale_create(request):
         formset = SaleItemFormSet(request.POST)
         
         if form.is_valid() and formset.is_valid():
+            # Validar stock antes de guardar
+            stock_errors = []
+            for form_item in formset:
+                if form_item.cleaned_data and not form_item.cleaned_data.get('DELETE', False):
+                    product = form_item.cleaned_data['product']
+                    quantity = form_item.cleaned_data['quantity']
+                    
+                    if product.stock_quantity < quantity:
+                        stock_errors.append(
+                            f"Stock insuficiente para {product.name}. "
+                            f"Disponible: {product.stock_quantity}, Solicitado: {quantity}"
+                        )
+            
+            if stock_errors:
+                for error in stock_errors:
+                    messages.error(request, error)
+                context = {
+                    'form': form,
+                    'formset': formset,
+                    'title': 'Crear Venta',
+                    'clients': Client.objects.all(),
+                    'products': Product.objects.filter(is_active=True),
+                }
+                return render(request, 'sales/sale_form.html', context)
+            
+            # Proceder con el guardado si no hay errores de stock
             sale = form.save(commit=False)
             sale.subtotal = 0
             sale.save()
             
-            # Calcular subtotal de los items
             subtotal = 0
-            for form in formset:
-                if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                    sale_item = form.save(commit=False)
+            for form_item in formset:
+                if form_item.cleaned_data and not form_item.cleaned_data.get('DELETE', False):
+                    sale_item = form_item.save(commit=False)
                     sale_item.sale = sale
                     sale_item.unit_price = sale_item.product.price
                     sale_item.save()
                     subtotal += sale_item.total_price
+                    
+                    # Actualizar stock del producto
+                    product = sale_item.product
+                    product.stock_quantity -= sale_item.quantity
+                    product.save()
             
-            # Actualizar sale con subtotal y total
             sale.subtotal = subtotal
             sale.save()
             

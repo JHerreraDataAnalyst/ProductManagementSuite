@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'rest_framework',
     'corsheaders',  # Para permitir requests desde otros dominios
+    'widget_tweaks',
 ]
 
 

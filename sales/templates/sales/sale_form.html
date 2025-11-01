@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }} - Sistema de Inventario{% endblock %}
 
@@ -50,60 +51,87 @@
                     </div>
 
                     <!-- Items de la Venta -->
-                    <h5 class="mb-3">Productos</h5>
-                    {{ formset.management_form }}
+                    <h5 class="mb-3">
+                        <i class="bi bi-cart-check"></i> Productos
+                        <small class="text-muted">(Los precios se cargan automáticamente)</small>
+                    </h5>
                     
+                    {{ formset.management_form }}
                     <div id="formset-container">
                         {% for form in formset %}
-                        <div class="row formset-row mb-3">
-                            <div class="col-md-6">
-                                {{ form.product.label_tag }}
+                        <div class="row formset-row mb-3 border-bottom pb-3">
+                            <div class="col-md-5">
+                                <label class="form-label">Producto *</label>
                                 {{ form.product }}
+                                {{ form.id }}
+                                {% if form.product.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.product.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
-                            <div class="col-md-3">
-                                {{ form.quantity.label_tag }}
+                            <div class="col-md-2">
+                                <label class="form-label">Cantidad *</label>
                                 {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.quantity.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Precio Unit.</label>
-                                <input type="text" class="form-control unit-price" readonly>
+                                <input type="text" class="form-control unit-price" readonly 
+                                       placeholder="$0.00" data-product-id="">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Subtotal</label>
+                                <input type="text" class="form-control item-total" readonly 
+                                       placeholder="$0.00">
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label">&nbsp;</label>
                                 {% if formset.can_delete %}
-                                <div class="form-check mt-2">
-                                    {{ form.DELETE }}
-                                    <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">
-                                        Eliminar
-                                    </label>
-                                </div>
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-form" 
+                                        style="margin-top: 8px;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                                 {% endif %}
                             </div>
                         </div>
                         {% endfor %}
                     </div>
 
-                    <button type="button" id="add-form" class="btn btn-outline-primary btn-sm mb-4">
+                    <button type="button" id="add-form" class="btn btn-outline-primary mb-4">
                         <i class="bi bi-plus-circle"></i> Agregar Producto
                     </button>
 
                     <!-- Totales -->
                     <div class="row mb-4">
                         <div class="col-md-6 offset-md-6">
-                            <table class="table table-bordered">
-                                <tr>
-                                    <td><strong>Subtotal:</strong></td>
-                                    <td id="subtotal">$0.00</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Impuesto (12%):</strong></td>
-                                    <td id="tax">$0.00</td>
-                                </tr>
-                                <tr class="table-active">
-                                    <td><strong>Total:</strong></td>
-                                    <td id="total"><strong>$0.00</strong></td>
-                                </tr>
-                            </table>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Resumen de la Venta</h6>
+                                    <table class="table table-borderless mb-0">
+                                        <tr>
+                                            <td><strong>Subtotal:</strong></td>
+                                            <td id="subtotal" class="text-end">$0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Impuesto (12%):</strong></td>
+                                            <td id="tax" class="text-end">$0.00</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td><strong>Total:</strong></td>
+                                            <td id="total" class="text-end"><strong>$0.00</strong></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -121,9 +149,9 @@
                            class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-success">
                             <i class="bi bi-check-circle"></i> 
-                            {% if sale %}Actualizar{% else %}Crear{% endif %} Venta
+                            {% if sale %}Actualizar{% else %}Registrar{% endif %} Venta
                         </button>
                     </div>
                 </form>
@@ -135,14 +163,27 @@
 
 {% block extra_js %}
 <script>
-// JavaScript para manejar el formset dinámico y cálculos
+// Datos de productos (precios)
+const productPrices = {
+    {% for product in products %}
+    "{{ product.id }}": {{ product.price }},
+    {% endfor %}
+};
+
+// Datos de stock disponible
+const productStock = {
+    {% for product in products %}
+    "{{ product.id }}": {{ product.stock_quantity }},
+    {% endfor %}
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     const formsetContainer = document.getElementById('formset-container');
     const addFormButton = document.getElementById('add-form');
     const totalForms = document.getElementById('id_form-TOTAL_FORMS');
     
     let formCount = parseInt(totalForms.value);
-    
+
     // Función para agregar nuevo formulario
     addFormButton.addEventListener('click', function() {
         const newForm = document.querySelector('.formset-row').cloneNode(true);
@@ -153,43 +194,112 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Limpiar valores
         newForm.querySelectorAll('input, select').forEach(input => {
-            if (input.type !== 'hidden' && input.name !== 'DELETE') {
+            if (input.type !== 'hidden' && !input.classList.contains('unit-price') && !input.classList.contains('item-total')) {
                 input.value = '';
             }
         });
         
+        // Limpiar campos de precio y total
+        newForm.querySelector('.unit-price').value = '';
+        newForm.querySelector('.item-total').value = '';
+        
         formsetContainer.appendChild(newForm);
         formCount++;
         totalForms.value = formCount;
+        
+        // Agregar event listeners al nuevo formulario
+        addEventListenersToForm(newForm);
     });
-    
-    // Función para calcular totales
+
+    // Función para agregar event listeners a un formulario
+    function addEventListenersToForm(form) {
+        const productSelect = form.querySelector('select[name*="product"]');
+        const quantityInput = form.querySelector('input[name*="quantity"]');
+        const unitPriceField = form.querySelector('.unit-price');
+        const itemTotalField = form.querySelector('.item-total');
+        const removeButton = form.querySelector('.remove-form');
+
+        // Event listener para cambio de producto
+        productSelect.addEventListener('change', function() {
+            const productId = this.value;
+            if (productId && productPrices[productId]) {
+                const price = productPrices[productId];
+                unitPriceField.value = '$' + price.toFixed(2);
+                unitPriceField.setAttribute('data-product-id', productId);
+                
+                // Actualizar stock disponible en el placeholder
+                const stock = productStock[productId] || 0;
+                quantityInput.setAttribute('max', stock);
+                quantityInput.setAttribute('placeholder', `Stock: ${stock}`);
+                
+                calculateItemTotal(form);
+                calculateTotals();
+            } else {
+                unitPriceField.value = '';
+                unitPriceField.setAttribute('data-product-id', '');
+                quantityInput.removeAttribute('max');
+                quantityInput.setAttribute('placeholder', 'Cantidad');
+                calculateItemTotal(form);
+            }
+        });
+
+        // Event listener para cambio de cantidad
+        quantityInput.addEventListener('input', function() {
+            calculateItemTotal(form);
+            calculateTotals();
+            
+            // Validar stock
+            const productId = unitPriceField.getAttribute('data-product-id');
+            const stock = productStock[productId] || 0;
+            const quantity = parseInt(this.value) || 0;
+            
+            if (quantity > stock) {
+                this.classList.add('is-invalid');
+                this.nextElementSibling?.remove();
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-danger small';
+                errorDiv.textContent = `Stock insuficiente. Disponible: ${stock}`;
+                this.parentNode.appendChild(errorDiv);
+            } else {
+                this.classList.remove('is-invalid');
+                this.nextElementSibling?.remove();
+            }
+        });
+
+        // Event listener para botón eliminar
+        if (removeButton) {
+            removeButton.addEventListener('click', function() {
+                form.remove();
+                formCount--;
+                totalForms.value = formCount;
+                calculateTotals();
+            });
+        }
+    }
+
+    // Función para calcular total por item
+    function calculateItemTotal(form) {
+        const quantityInput = form.querySelector('input[name*="quantity"]');
+        const unitPriceField = form.querySelector('.unit-price');
+        const itemTotalField = form.querySelector('.item-total');
+        
+        const quantity = parseInt(quantityInput.value) || 0;
+        const unitPriceText = unitPriceField.value.replace('$', '');
+        const unitPrice = parseFloat(unitPriceText) || 0;
+        
+        const total = quantity * unitPrice;
+        itemTotalField.value = total > 0 ? '$' + total.toFixed(2) : '';
+    }
+
+    // Función para calcular totales generales
     function calculateTotals() {
         let subtotal = 0;
         
-        document.querySelectorAll('.formset-row').forEach(row => {
-            const quantityInput = row.querySelector('input[name*="quantity"]');
-            const productSelect = row.querySelector('select[name*="product"]');
-            const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-            
-            if (!deleteCheckbox || !deleteCheckbox.checked) {
-                const quantity = parseInt(quantityInput.value) || 0;
-                const productId = productSelect.value;
-                
-                if (productId) {
-                    // Aquí deberías obtener el precio del producto desde el servidor
-                    // Por ahora usamos un valor fijo para demostración
-                    const unitPrice = 10; // Esto debería venir de la base de datos
-                    const total = quantity * unitPrice;
-                    subtotal += total;
-                    
-                    // Actualizar campo de precio unitario
-                    const unitPriceField = row.querySelector('.unit-price');
-                    if (unitPriceField) {
-                        unitPriceField.value = '$' + unitPrice.toFixed(2);
-                    }
-                }
-            }
+        document.querySelectorAll('.formset-row').forEach(form => {
+            const itemTotalField = form.querySelector('.item-total');
+            const itemTotalText = itemTotalField.value.replace('$', '');
+            const itemTotal = parseFloat(itemTotalText) || 0;
+            subtotal += itemTotal;
         });
         
         const tax = subtotal * 0.12;
@@ -199,14 +309,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tax').textContent = '$' + tax.toFixed(2);
         document.getElementById('total').textContent = '$' + total.toFixed(2);
     }
-    
-    // Event listeners para cálculos en tiempo real
-    document.addEventListener('change', function(e) {
-        if (e.target.matches('select[name*="product"], input[name*="quantity"], input[name*="DELETE"]')) {
-            calculateTotals();
-        }
+
+    // Agregar event listeners a los formularios existentes
+    document.querySelectorAll('.formset-row').forEach(form => {
+        addEventListenersToForm(form);
     });
-    
+
     // Calcular totales iniciales
     calculateTotals();
 });

@@ -38,7 +38,7 @@
                             <tr>
                                 <td><strong>Categoría:</strong></td>
                                 <td>
-                                    <span class="badge bg-primary">{{ product.get_category_display }}</span>
+                                    <span class="badge bg-primary">{{ product.category.name }}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -74,9 +74,12 @@
                         </div>
                         
                         <div class="mt-4 text-center">
-                            <div class="alert {% if product.stock < 10 %}alert-danger{% elif product.stock < 20 %}alert-warning{% else %}alert-success{% endif %}">
-                                <h4>{{ product.stock }}</h4>
+                            <div class="alert {% if product.stock_quantity < product.min_stock %}alert-danger{% elif product.stock_quantity < product.min_stock|add:10 %}alert-warning{% else %}alert-success{% endif %}">
+                                <h4>{{ product.stock_quantity }}</h4>
                                 <small>Unidades en Stock</small>
+                                {% if product.stock_quantity < product.min_stock %}
+                                <br><small class="fst-italic">¡Stock bajo! Mínimo: {{ product.min_stock }}</small>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -98,10 +101,10 @@
                 <div class="mb-3">
                     <strong>Nivel de Stock:</strong>
                     <div class="progress mt-2">
-                        {% with percent=product.stock|divisibleby:100 %}
-                        <div class="progress-bar {% if product.stock < 10 %}bg-danger{% elif product.stock < 20 %}bg-warning{% else %}bg-success{% endif %}" 
-                             style="width: {% if product.stock > 100 %}100%{% else %}{{ product.stock }}%{% endif %}">
-                            {{ product.stock }} unidades
+                        {% with percent=product.stock_quantity %}
+                        <div class="progress-bar {% if product.stock_quantity < product.min_stock %}bg-danger{% elif product.stock_quantity < product.min_stock|add:10 %}bg-warning{% else %}bg-success{% endif %}" 
+                             style="width: {% if product.stock_quantity > 100 %}100%{% else %}{{ product.stock_quantity }}%{% endif %}">
+                            {{ product.stock_quantity }} unidades
                         </div>
                         {% endwith %}
                     </div>
@@ -164,15 +167,15 @@
                     </div>
                     <div class="col-md-3">
                         <small class="text-muted">Valor Total Stock</small>
-                        <p class="mb-0">${{ product.total_stock_value }}</p>
+                        <p class="mb-0">${{ product.total_stock_value|default:"0.00" }}</p>
                     </div>
                     <div class="col-md-3">
                         <small class="text-muted">Ganancia Potencial</small>
-                        <p class="mb-0">${{ product.potential_profit }}</p>
+                        <p class="mb-0">${{ product.potential_profit|default:"0.00" }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}  
+{% endblock %}

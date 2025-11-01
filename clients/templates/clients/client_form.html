@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block title %}{{ title }} - Sistema de Inventario{% endblock %}
 
@@ -6,15 +7,210 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Información del Cliente</h5>
+            </div>
             <div class="card-body">
-                <p>Formulario de cliente - Funciona!</p>
-                <a href="{% url 'clients:client_list' %}" class="btn btn-secondary">
-                    Volver a Clientes
-                </a>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <!-- Tipo de Cliente -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">{{ form.type.label }}</label>
+                            {{ form.type|add_class:"form-select" }}
+                            {% if form.type.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.type.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- RUC/Cédula -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.tax_id.id_for_label }}" class="form-label">{{ form.tax_id.label }}</label>
+                            {{ form.tax_id|add_class:"form-control" }}
+                            {% if form.tax_id.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.tax_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Nombre -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name|add_class:"form-control" }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.first_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Apellido -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name|add_class:"form-control" }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.last_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Razón Social (solo visible para empresas) -->
+                    <div class="row" id="company-name-field">
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.company_name.id_for_label }}" class="form-label">{{ form.company_name.label }}</label>
+                            {{ form.company_name|add_class:"form-control" }}
+                            {% if form.company_name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.company_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            {{ form.email|add_class:"form-control" }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone|add_class:"form-control" }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.phone.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                        {{ form.address|add_class:"form-control" }}
+                        {% if form.address.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.address.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <!-- Ciudad -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
+                            {{ form.city|add_class:"form-control" }}
+                            {% if form.city.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.city.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- País -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.country.id_for_label }}" class="form-label">{{ form.country.label }}</label>
+                            {{ form.country|add_class:"form-control" }}
+                            {% if form.country.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.country.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Notas -->
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
+                        {{ form.notes|add_class:"form-control" }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.notes.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'clients:client_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> {{ client|yesno:"Actualizar,Crear" }} Cliente
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+<!-- JavaScript para mostrar/ocultar campo de razón social -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const clientType = document.getElementById('client-type');
+    const companyNameField = document.getElementById('company-name-field');
+    
+    function toggleCompanyField() {
+        if (clientType.value === 'business') {
+            companyNameField.style.display = 'block';
+        } else {
+            companyNameField.style.display = 'none';
+        }
+    }
+    
+    // Ejecutar al cargar
+    toggleCompanyField();
+    
+    // Ejecutar cuando cambie el tipo
+    clientType.addEventListener('change', toggleCompanyField);
+});
+</script>
 {% endblock %}
