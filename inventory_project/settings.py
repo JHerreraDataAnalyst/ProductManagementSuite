@@ -28,7 +28,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Temporalmente para pruebas
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.100']
 
 
 # Application definition
@@ -166,3 +168,12 @@ REST_FRAMEWORK = {
 
 # CORS settings (para desarrollo)
 CORS_ALLOW_ALL_ORIGINS = True  # Solo en desarrollo
+CORS_ALLOW_CREDENTIALS = True
+
+# # CORS configuration
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000", 
+#     "http://192.168.1.100:3000",
+#     "exp://192.168.1.100:19000",  # Para Expo
+# ]
