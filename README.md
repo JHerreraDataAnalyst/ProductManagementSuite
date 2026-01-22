@@ -14,31 +14,54 @@ A comprehensive inventory, sales, and customer management system built with Djan
 
 ## 📊 Interface Overview
 
-### **Dashboard** (`Imagen1.jpg`)
+### **Dashboard**
+![Dashboard Interface](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen1.jpg?raw=true)
 - Main control panel with monthly sales overview
 - Quick actions panel for common operations
 - Inventory status and alerts
 - Left navigation menu with all modules
 
-### **Product Management** (`Imagen3.jpg`, `Imagen4.jpg`)
+### **Product Management**
+| Inventory View | Create Product |
+|----------------|----------------|
+| ![Product Inventory](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen3.jpg?raw=true) | ![Create Product](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen4.jpg?raw=true) |
+
 - Product inventory with advanced search and filtering
 - Product creation form with SKU and barcode support
 - Category management system
 - Stock level tracking and alerts
 
-### **Customer Management** (`Imagen5.jpg`, `Imagen6.jpg`)
+### **Customer Management**
+| Customer List | Create Customer |
+|---------------|-----------------|
+| ![Customer List](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen5.jpg?raw=true) | ![Create Customer](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen6.jpg?raw=true) |
+
 - Customer database with search capabilities
 - Detailed customer registration (tax ID, contact info, address)
 - Customer type filtering (Individual/Company)
 - Notes and additional information fields
 
-### **Sales Management** (`Imagen7.jpg`, `Imagen8.jpg`)
+### **Sales Management**
+| Sales Overview | Create Sale |
+|----------------|-------------|
+| ![Sales Management](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen7.jpg?raw=true) | ![Create Sale](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen8.jpg?raw=true) |
+
 - Sales tracking with date filtering
 - Financial KPIs (Total Sales, Revenue, Paid/Pending)
 - Sales creation interface with automatic calculations
 - Product selection and quantity management
 - Tax calculation (12%) and payment method tracking
 
+---
+
+**Gallery View - All Interfaces**
+| Dashboard | Product Inventory | Create Product | Customer List |
+|-----------|-------------------|----------------|---------------|
+| ![Dashboard](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen1.jpg?raw=true) | ![Product Inventory](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen3.jpg?raw=true) | ![Create Product](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen4.jpg?raw=true) | ![Customer List](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen5.jpg?raw=true) |
+
+| Create Customer | Sales Management | Create Sale |
+|-----------------|------------------|-------------|
+| ![Create Customer](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen6.jpg?raw=true) | ![Sales Management](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen7.jpg?raw=true) | ![Create Sale](https://github.com/JHerreraDataAnalyst/ProductManagementSuite/blob/main/static/images/Imagen8.jpg?raw=true) |
 
 
 ## 🛠️ Technology Stack
